@@ -1,27 +1,30 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.staticfiles import StaticFiles
-import socketio
 import asyncio
 import logging
-from datetime import datetime
-from typing import List, Dict, Optional
-from pydantic import BaseModel
 import uuid
+from datetime import datetime
+from typing import Dict, List, Optional
+
+import socketio
+from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Socket.IO for real-time updates
-sio = socketio.AsyncServer(async_mode='asgi', cors_allowed_origins=[])
+sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins=[])
 socket_app = socketio.ASGIApp(sio)
 
 app = FastAPI(title="BugBountyOps API")
+
 
 # Data Models
 class ScanRequest(BaseModel):
     program_id: str
     priority: str = "fast_pay"
+
 
 class FindingApproval(BaseModel):
     finding_id: str
@@ -30,10 +33,50 @@ class FindingApproval(BaseModel):
 
 # In-memory data (replace with database in production)
 PROGRAMS = [
-    {"id":"h1-google","name":"Google VRP","platform":"H1","payoutMax":1000000,"rps":0.5,"autoOK":True,"triageDays":14,"assetCount":2800,"tags":["web","mobile","cloud"]},
-    {"id":"apple-vrp","name":"Apple Security Bounty","platform":"Direct","payoutMax":1000000,"rps":0.2,"autoOK":False,"triageDays":30,"assetCount":120,"tags":["mobile","kernel"]},
-    {"id":"msrc","name":"Microsoft (MSRC)","platform":"Direct","payoutMax":40000,"rps":0.5,"autoOK":True,"triageDays":10,"assetCount":900,"tags":["cloud","desktop","ai"]},
-    {"id":"github","name":"GitHub","platform":"H1","payoutMax":30000,"rps":1.0,"autoOK":True,"triageDays":7,"assetCount":700,"tags":["dev","api","actions"]},
+    {
+        "id": "h1-google",
+        "name": "Google VRP",
+        "platform": "H1",
+        "payoutMax": 1000000,
+        "rps": 0.5,
+        "autoOK": True,
+        "triageDays": 14,
+        "assetCount": 2800,
+        "tags": ["web", "mobile", "cloud"],
+    },
+    {
+        "id": "apple-vrp",
+        "name": "Apple Security Bounty",
+        "platform": "Direct",
+        "payoutMax": 1000000,
+        "rps": 0.2,
+        "autoOK": False,
+        "triageDays": 30,
+        "assetCount": 120,
+        "tags": ["mobile", "kernel"],
+    },
+    {
+        "id": "msrc",
+        "name": "Microsoft (MSRC)",
+        "platform": "Direct",
+        "payoutMax": 40000,
+        "rps": 0.5,
+        "autoOK": True,
+        "triageDays": 10,
+        "assetCount": 900,
+        "tags": ["cloud", "desktop", "ai"],
+    },
+    {
+        "id": "github",
+        "name": "GitHub",
+        "platform": "H1",
+        "payoutMax": 30000,
+        "rps": 1.0,
+        "autoOK": True,
+        "triageDays": 7,
+        "assetCount": 700,
+        "tags": ["dev", "api", "actions"],
+    },
 ]
 
 FINDINGS = [

@@ -31,16 +31,16 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run Black formatter check
-        run: echo "Black formatting check temporarily disabled - will be re-enabled after formatting fixes"
+        run: black --check --diff engine/ tests/
 
       - name: Run isort import sorting check
-        run: echo "isort check temporarily disabled - will be re-enabled after formatting fixes"
+        run: isort --check-only --diff engine/ tests/
 
       - name: Run flake8 linting
-        run: echo "flake8 check temporarily disabled - will be re-enabled after formatting fixes"
+        run: flake8 engine/ tests/ --max-line-length=88 --extend-ignore=E203,W503
 
       - name: Run mypy type checking
-        run: echo "mypy check temporarily disabled - will be re-enabled after formatting fixes"
+        run: mypy engine/ --ignore-missing-imports
 
   # Unit and integration tests
   test:

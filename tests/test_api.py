@@ -1,17 +1,18 @@
 """Tests for FastAPI endpoints."""
 
-import pytest
 import json
+
+import pytest
 from httpx import AsyncClient
 
 class TestProgramsAPI:
     """Test program-related API endpoints."""
-    
+
     async def test_get_programs(self, client: AsyncClient):
         """Test retrieving all programs."""
         response = await client.get("/programs")
         assert response.status_code == 200
-        
+
         data = response.json()
         assert len(data) == 2  # From conftest.py fixtures
         assert data[0]["id"] == "test-program-1"
