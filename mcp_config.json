@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "bugbounty-ops": {
+      "command": "python",
+      "args": ["engine/mcp_server.py"],
+      "cwd": ".",
+      "env": {
+        "PYTHONPATH": "."
+      }
+    }
+  }
+}

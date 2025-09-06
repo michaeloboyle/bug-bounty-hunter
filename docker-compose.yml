@@ -1,0 +1,161 @@
+version: "3.9"
+
+services:
+  # FastAPI Backend
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: bbops-api
+    environment:
+      - PORT=8080
+      - DB_URL=postgresql://postgres:postgres@db:5432/bbops
+      - REDIS_URL=redis://redis:6379/0
+      - ARTIFACT_S3=http://minio:9000/bbops
+      - DEFAULT_RPS=${DEFAULT_RPS:-0.5}
+    ports: 
+      - "8080:8080"
+    depends_on:
+      - db
+      - redis
+      - minio
+    volumes:
+      # Development: mount source for hot reload
+      - ./engine/api:/app/api:ro
+      - ./profiles:/app/profiles:ro
+    restart: unless-stopped
+
+  # MCP Server for Claude Code
+  mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    container_name: bbops-mcp
+    environment:
+      - API_BASE=http://api:8080
+      - PYTHONPATH=/app
+    ports:
+      - "8081:8081"
+    depends_on:
+      - api
+    volumes:
+      # Development: mount source for hot reload
+      - ./engine:/app/engine:ro
+    restart: unless-stopped
+
+  # React UI
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile.ui
+    container_name: bbops-ui
+    ports:
+      - "4173:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  # Background Workers
+  workers:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: bbops-workers
+    command: ["python", "-m", "workers.main"]
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - ARTIFACT_S3=http://minio:9000/bbops
+      - DEFAULT_RPS=${DEFAULT_RPS:-0.5}
+    depends_on:
+      - redis
+      - minio
+    volumes:
+      - ./engine:/app/engine:ro
+      - ./profiles:/app/profiles:ro
+    restart: unless-stopped
+
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: bbops-db
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=bbops
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./ops/init-db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    restart: unless-stopped
+
+  # Redis Cache & Queue
+  redis:
+    image: redis:7-alpine
+    container_name: bbops-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+
+  # MinIO Object Storage
+  minio:
+    image: quay.io/minio/minio:RELEASE.2025-02-28T09-55-16Z
+    container_name: bbops-minio
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=minio123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    restart: unless-stopped
+
+  # Test Runner (for CI/CD)
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: bbops-test
+    command: ["pytest", "-v", "--cov=engine", "--cov-report=html", "--cov-report=term"]
+    environment:
+      - PYTHONPATH=/app
+      - TEST_DB_URL=postgresql://postgres:postgres@db-test:5432/bbops_test
+    depends_on:
+      - db-test
+    volumes:
+      - ./tests:/app/tests:ro
+      - ./engine:/app/engine:ro
+      - ./test-results:/app/test-results
+    profiles:
+      - testing
+
+  # Test Database (separate from main db)
+  db-test:
+    image: postgres:16-alpine
+    container_name: bbops-db-test
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=bbops_test
+    ports:
+      - "5433:5432"
+    volumes:
+      - test_db_data:/var/lib/postgresql/data
+    profiles:
+      - testing
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+  test_db_data:
+
+networks:
+  default:
+    name: bbops-network

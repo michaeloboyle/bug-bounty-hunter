@@ -1,0 +1,23 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements
+COPY requirements.txt requirements-test.txt ./
+RUN pip install --no-cache-dir -r requirements.txt -r requirements-test.txt
+
+# Copy source code
+COPY engine/ ./engine/
+COPY tests/ ./tests/
+
+# Create test results directory
+RUN mkdir -p test-results
+
+# Default command
+CMD ["pytest", "-v", "--cov=engine", "--cov-report=html:test-results/coverage", "--cov-report=term", "--junitxml=test-results/junit.xml"]

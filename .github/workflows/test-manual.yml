@@ -1,0 +1,159 @@
+name: Manual Test Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Type of tests to run'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - unit
+          - integration
+          - mcp
+          - e2e
+          - security
+      
+      coverage_threshold:
+        description: 'Minimum coverage threshold'
+        required: false
+        default: '80'
+        type: string
+      
+      debug_mode:
+        description: 'Enable debug logging'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  COVERAGE_THRESHOLD: ${{ github.event.inputs.coverage_threshold }}
+  DEBUG_MODE: ${{ github.event.inputs.debug_mode }}
+
+jobs:
+  manual-test:
+    name: Manual Test Execution
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Create test results directory
+        run: mkdir -p test-results
+
+      - name: Setup debug logging
+        if: env.DEBUG_MODE == 'true'
+        run: |
+          echo "DEBUG=1" >> $GITHUB_ENV
+          echo "VERBOSE=1" >> $GITHUB_ENV
+
+      - name: Run All Tests
+        if: github.event.inputs.test_type == 'all'
+        run: |
+          docker compose --profile testing build test
+          docker compose --profile testing up -d db-test
+          docker compose --profile testing run --rm test pytest tests/ -v \
+            --cov-fail-under=${{ env.COVERAGE_THRESHOLD }} \
+            --junitxml=test-results/junit-all.xml \
+            --cov-report=html:test-results/coverage-html \
+            --cov-report=xml:test-results/coverage.xml
+
+      - name: Run Unit Tests Only
+        if: github.event.inputs.test_type == 'unit'
+        run: |
+          docker compose --profile testing build test
+          docker compose --profile testing run --rm test pytest tests/ -m "unit or not integration" -v \
+            --cov-fail-under=${{ env.COVERAGE_THRESHOLD }} \
+            --junitxml=test-results/junit-unit.xml
+
+      - name: Run Integration Tests Only
+        if: github.event.inputs.test_type == 'integration'
+        run: |
+          docker compose --profile testing build test
+          docker compose --profile testing up -d db-test
+          docker compose --profile testing run --rm test pytest tests/ -m integration -v \
+            --junitxml=test-results/junit-integration.xml
+
+      - name: Run MCP Tests Only
+        if: github.event.inputs.test_type == 'mcp'
+        run: |
+          docker compose --profile testing build test
+          docker compose --profile testing run --rm test pytest tests/test_mcp_server.py -v \
+            --junitxml=test-results/junit-mcp.xml
+
+      - name: Run E2E Tests Only
+        if: github.event.inputs.test_type == 'e2e'
+        run: |
+          docker compose build
+          docker compose up -d
+          sleep 30
+          
+          # Run E2E tests
+          curl -f http://localhost:8080/docs
+          curl -f http://localhost:4173/
+          
+          # Test API endpoints
+          curl -f http://localhost:8080/programs
+          curl -f http://localhost:8080/mcp/status
+          
+          docker compose down -v
+
+      - name: Run Security Tests Only
+        if: github.event.inputs.test_type == 'security'
+        run: |
+          # Install security tools
+          pip install bandit[toml] safety
+          
+          # Run Bandit
+          bandit -r engine/ -f json -o test-results/bandit.json || true
+          
+          # Run Safety check
+          safety check --json --output test-results/safety.json || true
+          
+          # Run Trivy
+          docker run --rm -v $PWD:/workspace aquasec/trivy fs /workspace \
+            --format json --output /workspace/test-results/trivy.json || true
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: manual-test-results-${{ github.event.inputs.test_type }}
+          path: test-results/
+
+      - name: Create test summary
+        if: always()
+        run: |
+          echo "## Manual Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Test Type:** ${{ github.event.inputs.test_type }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Coverage Threshold:** ${{ env.COVERAGE_THRESHOLD }}%" >> $GITHUB_STEP_SUMMARY
+          echo "**Debug Mode:** ${{ env.DEBUG_MODE }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "test-results/coverage.xml" ]; then
+            COVERAGE=$(grep -o 'line-rate="[^"]*"' test-results/coverage.xml | head -1 | cut -d'"' -f2)
+            COVERAGE_PERCENT=$(echo "$COVERAGE * 100" | bc -l | cut -d'.' -f1)
+            echo "**Coverage:** $COVERAGE_PERCENT%" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Comment on PR (if applicable)
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const testType = '${{ github.event.inputs.test_type }}';
+            const threshold = '${{ env.COVERAGE_THRESHOLD }}';
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## Manual Test Results 🧪\n\n**Test Type:** ${testType}\n**Coverage Threshold:** ${threshold}%\n\nManual test run completed. Check the workflow logs for detailed results.`
+            });
