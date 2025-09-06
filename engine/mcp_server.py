@@ -321,13 +321,13 @@ async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
 
 💰 FINANCIAL IMPACT
 • Estimated Payout: ${finding['payoutEst']:,}
-• Program Max Payout: ${program['payoutMax']:,} if program else 'Unknown'}
+• Program Max Payout: ${program['payoutMax']:,} if program else 'Unknown'
 • Platform: {program['platform'] if program else 'Unknown'}
 
 📊 PROGRAM DETAILS
-• Triage Timeline: {program['triageDays']} days if program else 'Unknown'}
+• Triage Timeline: {program['triageDays'] if program else 'Unknown'} days
 • Auto-approval: {'Yes' if program and program['autoOK'] else 'No'}
-• Rate Limit: {program['rps']} req/sec if program else 'Unknown'}
+• Rate Limit: {program['rps'] if program else 'Unknown'} req/sec
 
 🔍 EVIDENCE
 """
