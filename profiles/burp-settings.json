@@ -1,0 +1,1 @@
+{"scanSpeed":"fast","maxConcurrentRequests":5,"inscopeOnly":true,"issueDefinitions":["xss","ssrf","idor","csrf","jwt"]}

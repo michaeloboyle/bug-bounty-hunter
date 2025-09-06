@@ -1,0 +1,33 @@
+version: 1
+flows:
+  - id: bugbounty-orchestrator
+    description: End-to-end automated bounty pipeline with human gate
+    entry:
+      agent: coordination
+      input_schema:
+        type: object
+        properties:
+          program_id: { type: string }
+          priority: { type: string, enum: [high_ceiling, fast_pay, mobile, web3] }
+    agents:
+      - id: coordination
+        tools: [queue, scope_policy, rate_governor, dup_db, platform_api]
+        next: recon
+      - id: recon
+        tools: [amass, tech_fingerprint, passive_dns]
+        next: analysis
+      - id: analysis
+        tools: [nuclei_planner, burp_planner, custom_checks]
+        next: scanner_farm
+      - id: scanner_farm
+        tools: [nuclei_run, burp_dast, custom_runners]
+        next: exploitation
+      - id: exploitation
+        tools: [safe_poc, sandbox, evidence_capture]
+        next: reporting
+      - id: reporting
+        tools: [cvss_v4, report_template, submission_adapter]
+        human_gate: true
+        next: submit
+      - id: submit
+        tools: [hackerone_api, bugcrowd_api, intigriti_api]

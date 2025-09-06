@@ -1,0 +1,6 @@
+rate-limit: 1
+concurrency: 5
+retries: 1
+bulk-size: 25
+header:
+  User-Agent: BugBountyOps/1.0
