@@ -35,31 +35,37 @@ graph TB
         MinIO[(MinIO<br/>Artifact Storage)]
     end
     
-    WebUI -.-> FastAPI
-    ClaudeCode -.-> MCP
+    WebUI --> FastAPI
+    ClaudeCode --> MCP
     MCP --> FastAPI
     
     FastAPI --> ActivityTracker
-    FastAPI --> ScanOrchestrator
-    FastAPI --> FindingManager
-    FastAPI --> EvidenceStore
+    FastAPI -.-> ScanOrchestrator
+    FastAPI -.-> FindingManager
+    FastAPI -.-> EvidenceStore
     
-    ScanOrchestrator --> ClaudeFlow
-    FindingManager --> Platforms
-    ScanOrchestrator --> Tools
+    ScanOrchestrator -.-> ClaudeFlow
+    FindingManager -.-> Platforms
+    ScanOrchestrator -.-> Tools
     
-    ActivityTracker --> PostgreSQL
-    FindingManager --> PostgreSQL
-    ScanOrchestrator --> Redis
-    EvidenceStore --> MinIO
+    ActivityTracker -.-> PostgreSQL
+    FindingManager -.-> PostgreSQL
+    ScanOrchestrator -.-> Redis
+    EvidenceStore -.-> MinIO
     
     style WebUI fill:#e1f5fe
     style ClaudeCode fill:#e8f5e8
     style FastAPI fill:#fff3e0
-    style ClaudeFlow fill:#f3e5f5
-    style PostgreSQL fill:#ffebee
-    style Redis fill:#fff8e1
-    style MinIO fill:#e0f2f1
+    style ActivityTracker fill:#fff3e0
+    style ClaudeFlow fill:#f3e5f5,stroke-dasharray: 5 5
+    style ScanOrchestrator fill:#f3e5f5,stroke-dasharray: 5 5
+    style FindingManager fill:#f3e5f5,stroke-dasharray: 5 5
+    style EvidenceStore fill:#f3e5f5,stroke-dasharray: 5 5
+    style Platforms fill:#f3e5f5,stroke-dasharray: 5 5
+    style Tools fill:#f3e5f5,stroke-dasharray: 5 5
+    style PostgreSQL fill:#ffebee,stroke-dasharray: 5 5
+    style Redis fill:#fff8e1,stroke-dasharray: 5 5
+    style MinIO fill:#e0f2f1,stroke-dasharray: 5 5
 ```
 
 ## 2. Bug Bounty Process Flow
@@ -83,36 +89,39 @@ flowchart TD
         Reporting[📄 Reporting Agent<br/>Documentation & CVSS scoring]
     end
     
-    InitFlow --> Coordination
-    Coordination --> Recon
-    Recon --> Analysis
-    Analysis --> ScannerFarm
-    ScannerFarm --> Exploitation
+    InitFlow -.-> Coordination
+    Coordination -.-> Recon
+    Recon -.-> Analysis
+    Analysis -.-> ScannerFarm
+    ScannerFarm -.-> Exploitation
     Exploitation --> HumanGate{Human Review Required}
     
     HumanGate -->|✅ Approved| Reporting
     HumanGate -->|❌ Rejected| Archive[Archive Finding]
     HumanGate -->|🔄 Needs Changes| Exploitation
     
-    Reporting --> AutoSubmit{Auto-Submit Enabled?}
-    AutoSubmit -->|Yes| SubmitPlatform[Submit to Platform]
+    Reporting -.-> AutoSubmit{Auto-Submit Enabled?}
+    AutoSubmit -.->|Yes| SubmitPlatform[Submit to Platform]
     AutoSubmit -->|No| QueueReview[Queue for Manual Review]
     
-    SubmitPlatform --> TrackPayout[Track Payout Status]
+    SubmitPlatform -.-> TrackPayout[Track Payout Status]
     QueueReview --> ManualSubmit[Manual Submission]
-    ManualSubmit --> TrackPayout
+    ManualSubmit -.-> TrackPayout
     
-    TrackPayout --> UpdateMetrics[Update Revenue Metrics]
+    TrackPayout -.-> UpdateMetrics[Update Revenue Metrics]
     Archive --> UpdateMetrics
     UpdateMetrics --> End([Process Complete])
     
-    style Coordination fill:#e3f2fd
-    style Recon fill:#e8f5e8
-    style Analysis fill:#fff3e0
-    style ScannerFarm fill:#f3e5f5
-    style Exploitation fill:#ffebee
-    style Reporting fill:#e0f2f1
+    style Coordination fill:#e3f2fd,stroke-dasharray: 5 5
+    style Recon fill:#e8f5e8,stroke-dasharray: 5 5
+    style Analysis fill:#fff3e0,stroke-dasharray: 5 5
+    style ScannerFarm fill:#f3e5f5,stroke-dasharray: 5 5
+    style Exploitation fill:#ffebee,stroke-dasharray: 5 5
+    style Reporting fill:#e0f2f1,stroke-dasharray: 5 5
     style HumanGate fill:#fff8e1
+    style AutoSubmit fill:#f3e5f5,stroke-dasharray: 5 5
+    style SubmitPlatform fill:#f3e5f5,stroke-dasharray: 5 5
+    style TrackPayout fill:#f3e5f5,stroke-dasharray: 5 5
 ```
 
 ## 3. Activity Tracking System (GitHub Actions Style)
@@ -211,14 +220,14 @@ graph LR
     end
     
     UserInput --> ActivityEngine
-    ClaudeFlow --> FindingProcessor
-    Platforms --> MetricsCalculator
-    Tools --> ArtifactManager
+    ClaudeFlow -.-> FindingProcessor
+    Platforms -.-> MetricsCalculator
+    Tools -.-> ArtifactManager
     
-    ActivityEngine --> Activities
-    FindingProcessor --> Findings
-    ArtifactManager --> Artifacts
-    MetricsCalculator --> Analytics
+    ActivityEngine -.-> Activities
+    FindingProcessor -.-> Findings
+    ArtifactManager -.-> Artifacts
+    MetricsCalculator -.-> Analytics
     
     Activities --> WebDashboard
     Findings --> WebDashboard
@@ -263,9 +272,9 @@ graph TD
         ComplianceCheck[Compliance Check<br/>Terms Validation]
     end
     
-    AutoScan --> ReviewFindings
-    AutoAnalysis --> ReviewFindings
-    AutoPoC --> ValidateEvidence
+    AutoScan -.-> ReviewFindings
+    AutoAnalysis -.-> ReviewFindings
+    AutoPoC -.-> ValidateEvidence
     
     ReviewFindings -->|✅ Approve| ApproveSubmission
     ReviewFindings -->|❌ Reject| AdjustSettings
@@ -274,7 +283,7 @@ graph TD
     ValidateEvidence -->|✅ Good| ApproveSubmission
     ValidateEvidence -->|❌ Insufficient| AutoPoC
     
-    ApproveSubmission -->|✅ Submit| AutoSubmit[Automated Submission]
+    ApproveSubmission -.->|✅ Submit| AutoSubmit[Automated Submission]
     ApproveSubmission -->|❌ Hold| QueueManual[Manual Queue]
     
     WebDashboard --> ReviewFindings
@@ -408,7 +417,7 @@ graph TB
     WorkerContainer --> RedisContainer
     
     APIContainer -.-> ClaudeFlowCloud
-    APIContainer -.-> PlatformAPIs
+    APIContainer -.-> PlatformAPIs  
     WorkerContainer -.-> SecurityTools
     
     APIContainer --> Logs
@@ -456,17 +465,17 @@ graph TD
         RetentionPolicy[Retention Policy<br/>Evidence lifecycle]
     end
     
-    ScopeCheck --> PassiveRecon
-    RateLimitCheck --> PassiveRecon
-    PermissionCheck --> PassiveRecon
+    ScopeCheck -.-> PassiveRecon
+    RateLimitCheck -.-> PassiveRecon
+    PermissionCheck -.-> PassiveRecon
     
-    PassiveRecon --> SafePoC
-    SafePoC --> EvidenceCapture
+    PassiveRecon -.-> SafePoC
+    SafePoC -.-> EvidenceCapture
     
-    EvidenceCapture --> FindingValidation
-    FindingValidation --> ImpactAssessment
-    ImpactAssessment --> ReportGeneration
-    ReportGeneration --> PlatformSubmission
+    EvidenceCapture -.-> FindingValidation
+    FindingValidation -.-> ImpactAssessment
+    ImpactAssessment -.-> ReportGeneration
+    ReportGeneration -.-> PlatformSubmission
     
     PassiveRecon -.-> ActivityAudit
     SafePoC -.-> ActivityAudit
@@ -478,6 +487,35 @@ graph TD
     style FindingValidation fill:#e3f2fd
     style ActivityAudit fill:#f3e5f5
 ```
+
+---
+
+## Implementation Status Legend
+
+**Solid lines (—)**: Fully implemented and functional
+**Dotted lines (- - -)**: Not yet implemented (simulation/placeholder)
+**Dashed borders**: Components that exist but need real implementation
+
+## Current Implementation Status
+
+### ✅ **Implemented & Working**
+- **Web UI Dashboard** - Complete React interface with real-time updates
+- **FastAPI Backend** - Full API with WebSocket support
+- **MCP Server** - Claude Code integration with all tools/resources
+- **Activity Tracking** - GitHub Actions-style workflow simulation
+- **Container Infrastructure** - Docker compose with all services
+
+### 🔄 **Partially Implemented (Simulation)**
+- **Scan Orchestrator** - Framework exists, but uses hardcoded delays
+- **Finding Manager** - Basic CRUD, but no real vulnerability detection
+- **Evidence Store** - Structure in place, but no actual artifact generation
+
+### ❌ **Not Yet Implemented**
+- **Claude Flow Integration** - No connection to actual 6-agent pipeline
+- **Bug Bounty Platform APIs** - No HackerOne/Bugcrowd integration
+- **Security Tools** - No Nuclei, Burp Suite, or other scanner integration
+- **Database Persistence** - Uses in-memory storage instead of PostgreSQL
+- **Real Vulnerability Scanning** - All scanning is simulated
 
 ---
 
@@ -493,3 +531,5 @@ These diagrams provide comprehensive visualization of:
 8. **Security & Compliance** - Ethical and safe operation procedures
 
 Each diagram can be rendered in any Markdown viewer that supports Mermaid, providing clear visual documentation for developers, stakeholders, and auditors.
+
+**Development Strategy**: As components are implemented, their connecting lines should be changed from dotted (-.->)  to solid (-->) and their styling updated to remove the dashed borders.
