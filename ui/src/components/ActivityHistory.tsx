@@ -255,19 +255,27 @@ const ActivityHistory: React.FC = () => {
                       {activity.triggeredBy}
                     </Typography>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '60px' }}>
-                        <Badge badgeContent={activity.runCount} color="primary">
-                          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
-                            Jobs
-                          </Typography>
-                        </Badge>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          Jobs
+                        </Typography>
+                        <Chip 
+                          label={activity.runCount} 
+                          color="primary" 
+                          size="small" 
+                          sx={{ height: '20px', fontSize: '0.75rem' }}
+                        />
                       </Box>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '60px' }}>
-                        <Badge badgeContent={activity.artifacts.length} color="secondary">
-                          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
-                            Artifacts
-                          </Typography>
-                        </Badge>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          Artifacts
+                        </Typography>
+                        <Chip 
+                          label={activity.artifacts.length} 
+                          color="secondary" 
+                          size="small" 
+                          sx={{ height: '20px', fontSize: '0.75rem' }}
+                        />
                       </Box>
                     </Box>
                   </Box>
