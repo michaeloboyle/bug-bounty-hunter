@@ -1,6 +1,6 @@
-# Bug Bounty Operations - System Architecture
+# Bug Bounty Operations - Safe Automation Architecture
 
-This document provides visual diagrams of the system architecture, process flows, and data relationships using Mermaid.
+This document provides visual diagrams of the safe automated intelligence collection system architecture, process flows, and data relationships using Mermaid.
 
 ## 1. System Architecture Overview
 
@@ -18,15 +18,16 @@ graph TB
     
     subgraph "Core Services"
         ActivityTracker[Activity Tracker<br/>GitHub Actions Style]
-        ScanOrchestrator[Scan Orchestrator<br/>Task Management]
-        FindingManager[Finding Manager<br/>Vulnerability Tracking]
-        EvidenceStore[Evidence Store<br/>Artifact Management]
+        AutomationEngine[Safe Automation Engine<br/>CT Logs + Rate Limited APIs]
+        PatternAnalysis[AI Pattern Analysis<br/>Correlation & Detection]
+        ResearchAssistant[Research Assistant<br/>Human-AI Collaboration]
     end
     
     subgraph "External Systems"
-        ClaudeFlow[Claude Flow<br/>6-Agent Pipeline]
+        CTLogs[Certificate Transparency Logs<br/>High-Frequency Automated]
+        RateLimitedAPIs[Rate Limited APIs<br/>Shodan, VirusTotal, Censys]
+        ManualResearch[Manual Research Sources<br/>GitHub, Google - Human Only]
         Platforms[Bug Bounty Platforms<br/>HackerOne, Bugcrowd]
-        Tools[Security Tools<br/>Nuclei, Burp Suite]
     end
     
     subgraph "Infrastructure"
@@ -40,87 +41,112 @@ graph TB
     MCP --> FastAPI
     
     FastAPI --> ActivityTracker
-    FastAPI -.-> ScanOrchestrator
-    FastAPI -.-> FindingManager
-    FastAPI -.-> EvidenceStore
+    FastAPI --> AutomationEngine
+    FastAPI --> PatternAnalysis
+    FastAPI --> ResearchAssistant
     
-    ScanOrchestrator -.-> ClaudeFlow
-    FindingManager -.-> Platforms
-    ScanOrchestrator -.-> Tools
+    AutomationEngine --> CTLogs
+    AutomationEngine -.-> RateLimitedAPIs
+    PatternAnalysis --> ResearchAssistant
+    ResearchAssistant -.-> ManualResearch
+    ResearchAssistant -.-> Platforms
     
-    ActivityTracker -.-> PostgreSQL
-    FindingManager -.-> PostgreSQL
-    ScanOrchestrator -.-> Redis
-    EvidenceStore -.-> MinIO
+    ActivityTracker --> PostgreSQL
+    AutomationEngine -.-> PostgreSQL
+    PatternAnalysis -.-> PostgreSQL
+    AutomationEngine --> Redis
+    ResearchAssistant -.-> MinIO
     
     style WebUI fill:#e1f5fe
     style ClaudeCode fill:#e8f5e8
     style FastAPI fill:#fff3e0
     style ActivityTracker fill:#fff3e0
-    style ClaudeFlow fill:#f3e5f5,stroke-dasharray: 5 5
-    style ScanOrchestrator fill:#f3e5f5,stroke-dasharray: 5 5
-    style FindingManager fill:#f3e5f5,stroke-dasharray: 5 5
-    style EvidenceStore fill:#f3e5f5,stroke-dasharray: 5 5
+    style AutomationEngine fill:#e8f5e8
+    style PatternAnalysis fill:#fff3e0
+    style ResearchAssistant fill:#e3f2fd
+    style CTLogs fill:#e8f5e8
+    style RateLimitedAPIs fill:#fff8e1,stroke-dasharray: 5 5
+    style ManualResearch fill:#ffebee,stroke-dasharray: 5 5
     style Platforms fill:#f3e5f5,stroke-dasharray: 5 5
-    style Tools fill:#f3e5f5,stroke-dasharray: 5 5
     style PostgreSQL fill:#ffebee,stroke-dasharray: 5 5
-    style Redis fill:#fff8e1,stroke-dasharray: 5 5
+    style Redis fill:#fff8e1
     style MinIO fill:#e0f2f1,stroke-dasharray: 5 5
 ```
 
-## 2. Bug Bounty Process Flow
+## 2. Safe Automation Process Flow
 
 ```mermaid
 flowchart TD
-    Start([User Initiates Scan]) --> ProgramSelect[Select Bug Bounty Program]
-    ProgramSelect --> ValidateScope{Validate Scope & Permissions}
+    Start([User Initiates Intelligence Collection]) --> ProgramSelect[Select Bug Bounty Program]
+    ProgramSelect --> CreateActivity[Create Activity Record]
     
-    ValidateScope -->|✅ Approved| CreateActivity[Create Activity Record]
-    ValidateScope -->|❌ Denied| Reject[Reject - Out of Scope]
+    CreateActivity --> InitAutomation[Initialize Safe Automation]
     
-    CreateActivity --> InitFlow[Initialize Claude Flow Pipeline]
-    
-    subgraph "Claude Flow 6-Agent Pipeline"
-        Coordination[🎯 Coordination Agent<br/>Scope validation, task planning]
-        Recon[🔍 Reconnaissance Agent<br/>Asset discovery, enumeration]
-        Analysis[🧠 Analysis Agent<br/>Vulnerability detection]
-        ScannerFarm[⚙️ Scanner Farm Agent<br/>Automated testing tools]
-        Exploitation[💥 Exploitation Agent<br/>Safe PoC generation]
-        Reporting[📄 Reporting Agent<br/>Documentation & CVSS scoring]
+    subgraph "High-Frequency Automation (24/7)"
+        CTMonitor[🔄 CT Log Monitor<br/>15-minute intervals]
+        DataProcessor[⚡ Data Processing<br/>Continuous analysis]
+        PatternDetection[🧠 AI Pattern Detection<br/>Real-time correlation]
+        AlertGeneration[🚨 Alert Generation<br/>Prioritized research leads]
     end
     
-    InitFlow -.-> Coordination
-    Coordination -.-> Recon
-    Recon -.-> Analysis
-    Analysis -.-> ScannerFarm
-    ScannerFarm -.-> Exploitation
-    Exploitation --> HumanGate{Human Review Required}
+    subgraph "Rate-Limited APIs (Respectful)"
+        ShodanEnrichment[🌐 Shodan API<br/>1 query/minute]
+        VirusTotalCheck[🔍 VirusTotal API<br/>4 queries/minute]  
+        CensysLookup[📊 Censys API<br/>Per subscription limit]
+    end
     
-    HumanGate -->|✅ Approved| Reporting
+    subgraph "Human-AI Collaboration"
+        ResearchLeads[📋 Research Lead Review<br/>Human evaluates priorities]
+        ManualSearch[🔎 Manual Investigation<br/>GitHub, Google searches]
+        AIAnalysis[🤖 AI-Assisted Analysis<br/>Pattern correlation]
+        EvidenceCompilation[📁 Evidence Compilation<br/>Automated organization]
+    end
+    
+    InitAutomation --> CTMonitor
+    CTMonitor --> DataProcessor
+    DataProcessor --> PatternDetection
+    PatternDetection --> AlertGeneration
+    
+    AlertGeneration --> ResearchLeads
+    ResearchLeads -->|High Priority| ManualSearch
+    ResearchLeads -->|Low Priority| QueueLater[Queue for Later]
+    
+    ManualSearch --> AIAnalysis
+    AIAnalysis --> EvidenceCompilation
+    
+    DataProcessor -.-> ShodanEnrichment
+    DataProcessor -.-> VirusTotalCheck
+    DataProcessor -.-> CensysLookup
+    
+    ShodanEnrichment --> PatternDetection
+    VirusTotalCheck --> PatternDetection
+    CensysLookup --> PatternDetection
+    
+    EvidenceCompilation --> HumanGate{Human Review & Approval}
+    
+    HumanGate -->|✅ Approved| SubmitPrep[Prepare Submission]
     HumanGate -->|❌ Rejected| Archive[Archive Finding]
-    HumanGate -->|🔄 Needs Changes| Exploitation
+    HumanGate -->|🔄 Needs More Research| ManualSearch
     
-    Reporting -.-> AutoSubmit{Auto-Submit Enabled?}
-    AutoSubmit -.->|Yes| SubmitPlatform[Submit to Platform]
-    AutoSubmit -->|No| QueueReview[Queue for Manual Review]
+    SubmitPrep --> ManualSubmit[Manual Platform Submission]
+    ManualSubmit -.-> TrackPayout[Track Payout Status]
     
-    SubmitPlatform -.-> TrackPayout[Track Payout Status]
-    QueueReview --> ManualSubmit[Manual Submission]
-    ManualSubmit -.-> TrackPayout
-    
-    TrackPayout -.-> UpdateMetrics[Update Revenue Metrics]
+    TrackPayout -.-> UpdateMetrics[Update Success Metrics]
     Archive --> UpdateMetrics
     UpdateMetrics --> End([Process Complete])
     
-    style Coordination fill:#e3f2fd,stroke-dasharray: 5 5
-    style Recon fill:#e8f5e8,stroke-dasharray: 5 5
-    style Analysis fill:#fff3e0,stroke-dasharray: 5 5
-    style ScannerFarm fill:#f3e5f5,stroke-dasharray: 5 5
-    style Exploitation fill:#ffebee,stroke-dasharray: 5 5
-    style Reporting fill:#e0f2f1,stroke-dasharray: 5 5
+    style CTMonitor fill:#e8f5e8
+    style DataProcessor fill:#e3f2fd
+    style PatternDetection fill:#fff3e0
+    style AlertGeneration fill:#fff8e1
+    style ShodanEnrichment fill:#fff8e1,stroke-dasharray: 5 5
+    style VirusTotalCheck fill:#fff8e1,stroke-dasharray: 5 5
+    style CensysLookup fill:#fff8e1,stroke-dasharray: 5 5
+    style ResearchLeads fill:#ffebee
+    style ManualSearch fill:#ffebee,stroke-dasharray: 5 5
+    style AIAnalysis fill:#e3f2fd
     style HumanGate fill:#fff8e1
-    style AutoSubmit fill:#f3e5f5,stroke-dasharray: 5 5
-    style SubmitPlatform fill:#f3e5f5,stroke-dasharray: 5 5
+    style ManualSubmit fill:#ffebee,stroke-dasharray: 5 5
     style TrackPayout fill:#f3e5f5,stroke-dasharray: 5 5
 ```
 
@@ -133,10 +159,10 @@ graph TB
         ActivityStarted[Activity Started<br/>⏯️ In Progress]
         
         subgraph "Job Execution"
-            Job1[Job: Reconnaissance<br/>🔍 Asset Discovery]
-            Job2[Job: Analysis<br/>🧠 Vuln Detection]
-            Job3[Job: Exploitation<br/>💥 PoC Generation]
-            Job4[Job: Reporting<br/>📄 Documentation]
+            Job1[Job: CT Monitoring<br/>🔄 Certificate Transparency]
+            Job2[Job: Data Processing<br/>⚡ Pattern Analysis]
+            Job3[Job: Research Leads<br/>📋 Human Investigation]
+            Job4[Job: Evidence Compilation<br/>📁 Automated Organization]
         end
         
         ActivityComplete[Activity Complete<br/>✅ Success/❌ Failed]
@@ -505,31 +531,35 @@ graph TD
 - **Activity Tracking** - GitHub Actions-style workflow simulation
 - **Container Infrastructure** - Docker compose with all services
 
-### 🔄 **Partially Implemented (Simulation)**
-- **Scan Orchestrator** - Framework exists, but uses hardcoded delays
-- **Finding Manager** - Basic CRUD, but no real vulnerability detection
-- **Evidence Store** - Structure in place, but no actual artifact generation
+### 🔄 **Ready for Safe Implementation**
+- **CT Log Monitor** - Framework exists, needs real CT API integration
+- **Pattern Analysis Engine** - Basic structure in place, needs AI correlation
+- **Research Assistant Interface** - UI framework exists, needs AI suggestions
+- **Rate Limiting System** - Framework in place, needs API integration
 
-### ❌ **Not Yet Implemented**
-- **Claude Flow Integration** - No connection to actual 6-agent pipeline
-- **Bug Bounty Platform APIs** - No HackerOne/Bugcrowd integration
-- **Security Tools** - No Nuclei, Burp Suite, or other scanner integration
-- **Database Persistence** - Uses in-memory storage instead of PostgreSQL
-- **Real Vulnerability Scanning** - All scanning is simulated
+### ❌ **Not Yet Implemented (Safe Automation Components)**
+- **Certificate Transparency Integration** - No real CT log processing
+- **Respectful API Manager** - No rate-limited API calls (Shodan, VirusTotal)
+- **AI Pattern Detection** - No automated vulnerability pattern recognition
+- **Manual Research Workflow** - No human-AI collaboration interface
+- **Evidence Compilation System** - No automated finding organization
 
 ---
 
 These diagrams provide comprehensive visualization of:
 
-1. **System Architecture** - Overall component relationships
-2. **Process Flow** - End-to-end bug bounty workflow
+1. **Safe Automation Architecture** - CT logs, rate-limited APIs, AI processing
+2. **Intelligence Collection Flow** - High-frequency automation with human oversight
 3. **Activity Tracking** - GitHub Actions-style execution tracking
-4. **Data Flow** - Information movement through the system
-5. **Human Integration** - Where human oversight is required
+4. **Data Flow** - Information movement through safe processing pipeline
+5. **Human-AI Collaboration** - Where manual research is required
 6. **MCP Integration** - Claude Code interface capabilities
 7. **Deployment** - Container orchestration and infrastructure
-8. **Security & Compliance** - Ethical and safe operation procedures
+8. **Legal Compliance** - Safe automation boundaries and audit trails
 
-Each diagram can be rendered in any Markdown viewer that supports Mermaid, providing clear visual documentation for developers, stakeholders, and auditors.
+Each diagram can be rendered in any Markdown viewer that supports Mermaid, providing clear visual documentation for developers, stakeholders, and compliance auditors.
 
-**Development Strategy**: As components are implemented, their connecting lines should be changed from dotted (-.->)  to solid (-->) and their styling updated to remove the dashed borders.
+**Implementation Priority**: 
+1. **Green components** (CT logs, AI processing) - Safe for high-frequency automation
+2. **Yellow components** (rate-limited APIs) - Implement with careful rate limiting
+3. **Red components** (manual research) - Human-initiated only, no automation

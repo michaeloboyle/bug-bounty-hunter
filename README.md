@@ -1,6 +1,6 @@
 # Bug Bounty Operations Center
 
-Automated bug bounty hunting system with human-in-the-loop oversight and Claude Code integration.
+Automated intelligence collection system with safe automation boundaries and human oversight. Processes Certificate Transparency logs at scale while respecting API rate limits and maintaining zero target interaction.
 
 ## 🚀 Quick Start
 
@@ -35,26 +35,28 @@ make dev
 - **Command execution** for scans, approvals, and system management
 - **Real-time querying** of system state and analytics
 
-### Automation Pipeline
-- **6-agent Claude Flow** orchestration (recon → analysis → exploitation → reporting)
-- **Platform integration** with HackerOne, Bugcrowd, Intigriti
-- **Scope validation** and rate limiting for ethical operation
-- **Safe PoC generation** without system damage
+### Safe Automated Intelligence Pipeline
+- **Certificate Transparency monitoring** - High-frequency automated processing
+- **Respectful API integration** - Rate-limited queries to Shodan, VirusTotal
+- **AI-powered pattern analysis** - Automated correlation of collected data
+- **Human-AI collaboration** - Manual research with AI assistance
+- **Zero target interaction** - All data from public sources and databases
 
 ## 🏗️ Architecture
 
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Web UI        │    │   Claude Code    │    │  Claude Flow    │
-│   (Human Loop)  │◄──►│   (MCP Client)   │◄──►│   (Agents)      │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-         │                       │                       │
-         ▼                       ▼                       ▼
+│   Web UI        │    │   Claude Code    │    │ Safe Automation │
+│   (Human Loop)  │◄──►│   (MCP Client)   │◄──►│   CT Logs +     │
+└─────────────────┘    └──────────────────┘    │   Rate Limited  │
+         │                       │              │   APIs          │
+         ▼                       ▼              └─────────────────┘
 ┌─────────────────────────────────────────────────────────────────┐
 │                    FastAPI Backend                              │
 │  • Real-time updates (WebSocket)                               │
 │  • MCP server endpoints                                        │
-│  • Platform integrations                                       │
+│  • AI pattern analysis engine                                 │
+│  • Respectful API management                                  │
 └─────────────────────────────────────────────────────────────────┘
          │
          ▼
@@ -96,11 +98,11 @@ make dev
 
 ### Available MCP Tools
 
-- `start_scan` - Launch vulnerability scan for specific program
+- `start_intelligence_collection` - Launch safe automated data collection
 - `approve_finding` - Approve finding for platform submission  
-- `stop_scan` - Halt running scan
-- `get_system_health` - Comprehensive system metrics
-- `analyze_finding` - Detailed finding analysis
+- `get_research_leads` - Get AI-generated prioritized research leads
+- `get_system_health` - Comprehensive system metrics and API usage
+- `analyze_finding` - AI-powered finding analysis with confidence scoring
 
 ### Available MCP Resources
 
@@ -121,34 +123,36 @@ make dev
 
 ### Via Claude Code (MCP)
 ```
-# Check system health
-What's the current status of the bug bounty system?
+# Check system health and API usage
+What's the current status of the intelligence collection system?
 
-# Start a scan
-Start a scan for the GitHub bug bounty program with high priority
+# Start safe automated collection
+Start intelligence collection for the GitHub bug bounty program
 
-# Analyze findings
-Analyze finding f2 and tell me if it's worth submitting
+# Get research leads for manual investigation
+What are the top priority research leads requiring human investigation?
 
-# Get system insights
-Show me revenue trends and most profitable vulnerability types
+# Analyze findings with AI assistance
+Analyze finding f2 and tell me the confidence score and manual verification steps needed
 ```
 
 ## 📊 Success Metrics
 
 **Target KPIs:**
-- **Monthly Revenue**: $25,000+ from automated discoveries
-- **Submission Rate**: 100+ vulnerability reports per month  
-- **Success Rate**: 15%+ acceptance rate on submissions
-- **Time to Discovery**: <24 hours from target ID to confirmed vulnerability
+- **Discovery Rate**: 20-50 vulnerabilities per major organization
+- **Confidence Accuracy**: 80%+ of high-confidence findings accepted
+- **Coverage**: 95%+ subdomain discovery rate via passive reconnaissance
+- **Time to Discovery**: <48 hours from target addition to vulnerability identification
+- **False Positive Rate**: <10% for findings marked as "ready for submission"
 
 ## 🔒 Safety & Ethics
 
-- **Scope validation** before any testing
-- **Rate limiting** to prevent service disruption
-- **No destructive testing** - safe PoC generation only
-- **Responsible disclosure** with proper timelines
-- **Human approval gates** for all submissions
+- **Zero target interaction** - No direct contact with target systems
+- **Safe automation boundaries** - CT logs unlimited, APIs rate-limited
+- **Respectful API usage** - Honor all terms of service and rate limits
+- **Manual research initiation** - GitHub/Google searches human-initiated only
+- **Human approval gates** - AI assists, humans decide
+- **Complete legal compliance** - No scanning behavior that triggers monitoring
 
 ## 🛠️ Development Commands
 
@@ -171,12 +175,16 @@ make mcp-test      # Test MCP server
 bug-bounty-hunter/
 ├── engine/               # Backend services
 │   ├── api/             # FastAPI application
-│   ├── scanner-farm/    # Vulnerability scanners
-│   ├── safe-poc/        # PoC generation
+│   ├── collectors/      # Passive data collectors
+│   ├── analyzers/       # Vulnerability detection
 │   └── mcp_server.py    # MCP server for Claude Code
 ├── ui/                  # React frontend
 │   ├── src/             # Source code
 │   └── dist/            # Built assets
+├── docs/                # Documentation
+│   ├── ARCHITECTURE.md  # System architecture
+│   ├── PASSIVE_SCANNING_DESIGN.md # Passive reconnaissance design
+│   └── IMPLEMENTATION_PLAN.md     # Development roadmap
 ├── flow/                # Claude Flow configuration
 │   ├── claude_flow.yaml # Agent orchestration
 │   └── prompts/         # Agent prompts
@@ -188,10 +196,16 @@ bug-bounty-hunter/
 ## 🚨 Important Notes
 
 1. **Human oversight required** - Never run fully autonomous
-2. **Rate limits enforced** - Respects program guidelines
-3. **Evidence preservation** - All findings include proof
-4. **Platform compliance** - Follows ToS for all bounty programs
-5. **Revenue tracking** - Built-in ROI analysis and reporting
+2. **Passive reconnaissance only** - No direct target system interaction
+3. **Evidence preservation** - All findings include confidence scores and proof
+4. **Platform compliance** - Follows ToS for all bounty programs and data sources
+5. **Legal safety** - Uses only publicly available information
+
+## 📖 Documentation
+
+- **[Architecture Overview](docs/ARCHITECTURE.md)** - Detailed system design and component interactions
+- **[Safe Automation Design](docs/SAFE_AUTOMATION_DESIGN.md)** - Legal automation boundaries and implementation
+- **[Implementation Plan](docs/IMPLEMENTATION_PLAN.md)** - Development roadmap and technical specifications
 
 ## 🤝 Contributing
 

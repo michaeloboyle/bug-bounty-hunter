@@ -1,35 +1,34 @@
-# Passive-Only Bug Bounty Scanning Pipeline
+# Safe Automated Intelligence Collection Design
 
 ## Overview
 
-A comprehensive passive reconnaissance and vulnerability discovery system that finds bugs without directly engaging target services. This approach minimizes legal risk while maximizing discovery potential through automated analysis of publicly available data.
+An automated intelligence processing system that safely collects and analyzes publicly available data for vulnerability discovery. The system focuses on high-frequency data processing with zero target interaction, respecting API rate limits and legal boundaries.
 
 ## 🎯 Core Principles
 
-- **Zero Direct Engagement** - Never directly contact target systems
-- **Public Data Only** - Use certificate transparency, DNS, search engines, code repositories
-- **Automated Scale** - Process thousands of assets simultaneously
-- **High Signal-to-Noise** - Focus on actionable vulnerabilities
-- **Legal Safety First** - All techniques use publicly available information
+- **Zero Target Interaction** - Never contact target systems directly
+- **Safe Data Sources Only** - CT logs, public databases, manual research
+- **Respectful Automation** - Honor rate limits and terms of service  
+- **High-Frequency Processing** - Automate data analysis, not collection
+- **Legal Safety First** - No scanning behavior that could trigger monitoring
 
 ## 🏗️ Pipeline Architecture
 
 ```mermaid
 graph TB
-    subgraph "Data Collection Phase"
-        CertTransparency[Certificate Transparency<br/>crt.sh, Censys, Shodan]
-        DNSRecon[DNS Reconnaissance<br/>Passive DNS, WHOIS]
-        CodeSearch[Code Repository Search<br/>GitHub, GitLab, Bitbucket]
-        SearchEngines[Search Engine Dorking<br/>Google, Bing, DuckDuckGo]
-        ThreatIntel[Threat Intelligence<br/>VirusTotal, URLVoid]
+    subgraph "Safe Data Collection"
+        CertTransparency[Certificate Transparency Logs<br/>crt.sh - High Frequency Automated]
+        PublicDatabases[Public Security Databases<br/>Shodan, Censys - Rate Limited]
+        ManualResearch[Manual Research<br/>Human-Initiated GitHub/Search]
+        ThreatIntel[Threat Intelligence APIs<br/>VirusTotal - Respectful Usage]
     end
     
-    subgraph "Processing & Analysis"
-        AssetInventory[Asset Inventory<br/>Subdomains, IPs, Services]
-        TechStack[Technology Stack Analysis<br/>Versions, Frameworks, Libraries]
-        VulnCorrelation[Vulnerability Correlation<br/>CVEs, Misconfigurations]
-        ContentAnalysis[Content Analysis<br/>Secrets, APIs, Documentation]
-        BusinessLogic[Business Logic Analysis<br/>Access Patterns, Workflows]
+    subgraph "High-Frequency Processing"
+        AssetInventory[Asset Inventory<br/>Automated Subdomain Cataloging]
+        PatternAnalysis[Pattern Analysis<br/>AI-Powered Correlation Engine]
+        VulnCorrelation[Vulnerability Correlation<br/>CVE Database Cross-Reference]
+        DataEnrichment[Data Enrichment<br/>Context & Intelligence Layer]
+        AlertGeneration[Alert Generation<br/>Research Lead Prioritization]
     end
     
     subgraph "Vulnerability Detection"
