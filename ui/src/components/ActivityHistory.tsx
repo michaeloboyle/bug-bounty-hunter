@@ -249,21 +249,25 @@ const ActivityHistory: React.FC = () => {
                     </Box>
                   </Box>
                   
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
                     <Typography variant="body2" color="text.secondary">
                       <Person fontSize="small" sx={{ mr: 0.5, verticalAlign: 'middle' }} />
                       {activity.triggeredBy}
                     </Typography>
-                    <Badge badgeContent={activity.runCount} color="primary">
-                      <Typography variant="body2" color="text.secondary">
-                        Jobs
-                      </Typography>
-                    </Badge>
-                    <Badge badgeContent={activity.artifacts.length} color="secondary">
-                      <Typography variant="body2" color="text.secondary">
-                        Artifacts
-                      </Typography>
-                    </Badge>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Badge badgeContent={activity.runCount} color="primary" sx={{ mr: 1 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          Jobs
+                        </Typography>
+                      </Badge>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Badge badgeContent={activity.artifacts.length} color="secondary">
+                        <Typography variant="body2" color="text.secondary">
+                          Artifacts
+                        </Typography>
+                      </Badge>
+                    </Box>
                   </Box>
                 </CardContent>
               </Card>
